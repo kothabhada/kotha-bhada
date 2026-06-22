@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#dc143c" />
+  <title>Kotha Bhada — Rent a House in Kathmandu, No Agent</title>
+  <meta name="description" content="Find houses, flats and rooms for rent in Kathmandu directly from owners. No agent, no commission." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css?v=59" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="logo" href="#" onclick="goHome();return false;">
+        <span class="mark">
+          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="dera-g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ff3b63"/>
+                <stop offset="0.55" stop-color="#dc143c"/>
+                <stop offset="1" stop-color="#9e0c2b"/>
+              </linearGradient>
+              <linearGradient id="dera-sheen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+                <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <rect width="512" height="512" rx="120" fill="url(#dera-g)"/>
+            <rect width="512" height="512" rx="120" fill="url(#dera-sheen)"/>
+            <text x="256" y="284" text-anchor="middle" font-family="Inter, 'Segoe UI', sans-serif"
+                  font-weight="800" font-size="232" letter-spacing="-14" fill="#fff">KB</text>
+          </svg>
+        </span>
+        <span>Kotha Bhada<small>RENT DIRECT · KATHMANDU</small></span>
+      </a>
+      <div class="header-actions">
+        <button class="btn ghost role-chip" id="role-chip" onclick="openWelcome()" title="Switch role"></button>
+        <button class="btn ghost lang-btn" id="lang-btn" onclick="toggleLang()">नेपाली</button>
+        <button class="btn ghost" id="mylistings-btn" style="display:none" onclick="openMyListings()" data-i18n="mylistings">My listings</button>
+        <button class="btn ghost" id="auth-btn" onclick="openAuth()" data-i18n="login">Log in</button>
+        <button class="btn" id="post-btn" onclick="openPostForm()" data-i18n="post">+ Post</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero + search -->
+  <section class="hero">
+    <div class="wrap">
+      <h1 id="hero-title" data-i18n-html="hero_title">Rent a home in <span>Kathmandu</span><br/>straight from the owner.</h1>
+      <p data-i18n="hero_sub">No agent. No commission. Just houses, flats and rooms — message the owner directly on WhatsApp or Viber.</p>
+
+      <div class="trust">
+        <span data-i18n="trust1">🚫 No agent fees</span>
+        <span data-i18n="trust2">💬 Direct contact</span>
+        <span data-i18n="trust3">📍 Map search</span>
+        <span data-i18n="trust4">❤️ Save favorites</span>
+      </div>
+
+      <div class="search">
+        <div class="field">
+          <label data-i18n="where">Where</label>
+          <input id="f-area" type="text" placeholder="Area e.g. Baneshwor, Lalitpur" data-i18n-ph="where_ph"
+                 autocomplete="off" oninput="areaInput()" onkeydown="areaKeydown(event)"
+                 onfocus="areaInput()" onblur="setTimeout(hideAreaSuggest,150)" />
+          <div id="area-suggest" class="suggest" role="listbox" aria-label="Area suggestions"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="type">Type</label>
+          <select id="f-type" onchange="applyFilters()">
+            <option value="" data-i18n="anytype">Any type</option>
+            <option value="House" data-i18n="house">House</option>
+            <option value="Flat" data-i18n="flat">Flat</option>
+            <option value="Room" data-i18n="room">Room</option>
+            <option value="Office" data-i18n="office">Office</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="maxrent">Max rent (रू)</label>
+          <select id="f-price" onchange="applyFilters()">
+            <option value="" data-i18n="anyprice">Any price</option>
+            <option value="15000" data-i18n="price15">Under 15,000</option>
+            <option value="25000" data-i18n="price25">Under 25,000</option>
+            <option value="40000" data-i18n="price40">Under 40,000</option>
+            <option value="60000" data-i18n="price60">Under 60,000</option>
+            <option value="100000" data-i18n="price100">Under 1 lakh</option>
+            <option value="200000" data-i18n="price200">Under 2 lakh</option>
+            <option value="500000" data-i18n="price500">Under 5 lakh</option>
+            <option value="1000000" data-i18n="price1000">Under 10 lakh</option>
+          </select>
+        </div>
+        <button class="btn" onclick="applyFilters()" data-i18n="search">Search</button>
+      </div>
+
+      <div class="chips" id="chips"></div>
+
+      <div class="filters2">
+        <select id="f-sort" onchange="applyFilters()" aria-label="Sort by">
+          <option value="newest" data-i18n="sort_newest">↕ Newest</option>
+          <option value="price_low" data-i18n="sort_price_low">Price: Low → High</option>
+          <option value="price_high" data-i18n="sort_price_high">Price: High → Low</option>
+        </select>
+        <select id="f-beds" onchange="applyFilters()" aria-label="Bedrooms">
+          <option value="" data-i18n="anybeds">Any beds</option>
+          <option value="1" data-i18n="beds1">1+ beds</option>
+          <option value="2" data-i18n="beds2">2+ beds</option>
+          <option value="3" data-i18n="beds3">3+ beds</option>
+          <option value="4" data-i18n="beds4">4+ beds</option>
+        </select>
+        <select id="f-furnished" onchange="applyFilters()" aria-label="Furnishing">
+          <option value="" data-i18n="anyfurnish">Any furnishing</option>
+          <option value="Furnished" data-i18n="furnished">Furnished</option>
+          <option value="Semi-furnished" data-i18n="semi">Semi-furnished</option>
+          <option value="Unfurnished" data-i18n="unfurnished">Unfurnished</option>
+        </select>
+        <button type="button" class="fbtn" id="f-parking" onclick="toggleFilterBtn('parking')" data-i18n="f_parking">🅿️ Parking</button>
+        <button type="button" class="fbtn" id="f-negotiable" onclick="toggleFilterBtn('negotiable')" data-i18n="f_negotiable">💬 Negotiable</button>
+        <button type="button" class="fbtn clear" id="f-clear" onclick="clearFilters()" data-i18n="clear">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Listings -->
+  <main class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 data-i18n="available">Available now</h2>
+        <div class="view-toggle">
+          <button class="vt active" id="vt-list" onclick="setView('list')" data-i18n="v_list">☰ List</button>
+          <button class="vt" id="vt-map" onclick="setView('map')" data-i18n="v_map">🗺 Map</button>
+          <button class="vt" id="vt-saved" onclick="setView('saved')"><span data-i18n="v_saved">♥ Saved</span> <span id="saved-count"></span></button>
+        </div>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div id="map" class="map-view" style="display:none"></div>
+    </div>
+  </main>
+
+  <!-- How it works -->
+  <section class="how">
+    <div class="wrap">
+      <h2 class="how-title" data-i18n="how_title">How Kotha Bhada works</h2>
+      <p class="how-sub" data-i18n="how_sub">Renting a home in Kathmandu, the simple way — no agent, no commission.</p>
+      <div class="how-steps">
+        <div class="step">
+          <div class="step-ico">🔍</div>
+          <h3 data-i18n="how1_t">1. Search</h3>
+          <p data-i18n="how1_d">Browse homes by area, price and type — with photos, videos and a map.</p>
+        </div>
+        <div class="step">
+          <div class="step-ico">💬</div>
+          <h3 data-i18n="how2_t">2. Message the owner</h3>
+          <p data-i18n="how2_d">Contact the owner directly on WhatsApp or Viber. No middleman.</p>
+        </div>
+        <div class="step">
+          <div class="step-ico">🔑</div>
+          <h3 data-i18n="how3_t">3. Move in</h3>
+          <p data-i18n="how3_d">Visit, agree on the rent, and move in. No commission, no hidden fees.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust footer -->
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <strong>Kotha Bhada</strong>
+        <span data-i18n="foot_tagline">Rent direct in Kathmandu Valley.</span>
+      </div>
+      <div class="footer-trust">
+        <span data-i18n="foot_t1">🚫 No agent fees</span>
+        <span data-i18n="foot_t2">🔒 Direct with owners</span>
+        <span data-i18n="foot_t3">🇳🇵 Made for Kathmandu</span>
+      </div>
+      <div class="footer-help">
+        <span data-i18n="foot_help">Need help?</span>
+        <a href="https://wa.me/9779744325842" target="_blank">WhatsApp</a>
+        ·
+        <a href="mailto:kothabhada246@gmail.com">Email</a>
+      </div>
+      <div class="footer-copy">© 2026 Kotha Bhada · <span data-i18n="foot_love">Built with ❤️ for renters &amp; owners</span></div>
+    </div>
+  </footer>
+
+  <!-- Listing detail modal -->
+  <div class="modal-backdrop" id="detail-modal" onclick="if(event.target===this)closeModals()">
+    <div class="modal" id="detail-content"></div>
+  </div>
+
+  <!-- Post house modal -->
+  <div class="modal-backdrop" id="post-modal" onclick="if(event.target===this)closeModals()">
+    <div class="modal">
+      <div class="modal-body">
+        <button class="close" style="position:static;float:right" onclick="closeModals()">✕</button>
+        <h2 id="post-title">Post your house — free</h2>
+        <p class="hint" id="post-sub">Fill this and renters will contact you directly. No agent, no fees.</p>
+        <form id="post-form" onsubmit="submitListing(event)" style="margin-top:14px">
+          <div class="form-grid">
+            <div class="form-field full">
+              <label data-i18n="l_title">Title *</label>
+              <input name="title" required placeholder="e.g. Sunny 2BHK Flat near Baneshwor" data-i18n-ph="ph_title" />
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_type">Type *</label>
+              <select name="type" required>
+                <option value="" data-i18n="choose">Choose</option>
+                <option value="House" data-i18n="house">House</option><option value="Flat" data-i18n="flat">Flat</option><option value="Room" data-i18n="room">Room</option><option value="Office" data-i18n="office">Office</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_area">Area / Location *</label>
+              <input name="area" required placeholder="e.g. New Baneshwor" data-i18n-ph="ph_area" />
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_rent">Monthly rent (रू) *</label>
+              <input name="price" type="number" required placeholder="22000" />
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_bedrooms">Bedrooms</label>
+              <input name="bedrooms" type="number" placeholder="2" />
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_bathrooms">Bathrooms</label>
+              <input name="bathrooms" type="number" placeholder="1" />
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_furnishing">Furnishing</label>
+              <select name="furnished">
+                <option value="Unfurnished" data-i18n="unfurnished">Unfurnished</option><option value="Semi-furnished" data-i18n="semi">Semi-furnished</option><option value="Furnished" data-i18n="furnished">Furnished</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label data-i18n="l_extras">Extras</label>
+              <div class="checks">
+                <label class="check"><input type="checkbox" name="parking" /> <span data-i18n="c_parking">🅿️ Parking available</span></label>
+                <label class="check"><input type="checkbox" name="negotiable" /> <span data-i18n="c_negotiable">💬 Price negotiable</span></label>
+              </div>
+            </div>
+            <div class="form-field full">
+              <label data-i18n="l_desc">Description</label>
+              <textarea name="description" placeholder="Water supply, parking, nearby landmarks..." data-i18n-ph="ph_desc"></textarea>
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_name">Your name *</label>
+              <input name="owner" required placeholder="Your name" data-i18n-ph="ph_name" />
+            </div>
+            <div class="form-field">
+              <label data-i18n="l_phone">WhatsApp/Viber number *</label>
+              <input name="phone" required placeholder="98XXXXXXXX" />
+            </div>
+            <div class="form-field full">
+              <label data-i18n="l_photos">Photos</label>
+              <input id="photo-input" name="photos" type="file" accept="image/*" multiple
+                     onchange="previewPhotos(event)" />
+              <span class="hint" data-i18n="h_photos">Pick up to 5 photos from your phone or computer. First photo is the cover.</span>
+              <div id="photo-preview" class="photo-preview"></div>
+            </div>
+            <div class="form-field full">
+              <label data-i18n="l_video">Video (optional)</label>
+              <input id="video-input" name="video" type="file" accept="video/*" onchange="previewVideo(event)" />
+              <span class="hint" data-i18n="h_video">Add a short walkthrough video (under ~50 MB). Renters love seeing the space in motion.</span>
+              <div id="video-preview" class="video-preview"></div>
+            </div>
+          </div>
+          <button class="btn block lg" type="submit" style="margin-top:18px" id="post-submit">Post my house</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth modal -->
+  <div class="modal-backdrop" id="auth-modal" onclick="if(event.target===this)closeModals()">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-body">
+        <button class="close" style="position:static;float:right" onclick="closeModals()">✕</button>
+        <h2 id="auth-title">Log in</h2>
+        <p class="hint" id="auth-sub">Log in to post and manage your houses.</p>
+        <form id="auth-form" onsubmit="submitAuth(event)" style="margin-top:14px">
+          <div class="form-field" style="margin-bottom:12px">
+            <label data-i18n="l_email">Email</label>
+            <input name="email" type="email" required placeholder="you@email.com" />
+          </div>
+          <div class="form-field">
+            <label data-i18n="l_password">Password</label>
+            <input name="password" type="password" required minlength="6" placeholder="At least 6 characters" />
+          </div>
+          <button class="btn block lg" type="submit" style="margin-top:18px" id="auth-submit">Log in</button>
+        </form>
+        <p class="hint" style="text-align:center;margin-top:14px">
+          <span id="auth-switch-text">New owner?</span>
+          <a href="#" onclick="toggleAuthMode();return false;" style="color:var(--brand);font-weight:700"
+             id="auth-switch-link">Create an account</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- My listings modal -->
+  <div class="modal-backdrop" id="mylistings-modal" onclick="if(event.target===this)closeModals()">
+    <div class="modal">
+      <div class="modal-body">
+        <button class="close" style="position:static;float:right" onclick="closeModals()">✕</button>
+        <h2 data-i18n="mylistings">My listings</h2>
+        <p class="hint" id="mylistings-email"></p>
+        <div id="mylistings-list" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome / role chooser -->
+  <div class="modal-backdrop" id="welcome-modal" onclick="if(event.target===this && getRole())closeModals()">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-body">
+        <button class="close" id="welcome-close" style="position:static;float:right;display:none" onclick="closeModals()">✕</button>
+        <h2 data-i18n="welcome_title">Welcome to Kotha Bhada 🏠</h2>
+        <p class="hint" data-i18n="welcome_sub">What brings you here today?</p>
+        <div class="role-cards">
+          <button class="role-card" onclick="setRole('renter')">
+            <div class="role-ico">🔍</div>
+            <div class="role-t" data-i18n="role_renter_t">I'm looking for a home</div>
+            <div class="role-d" data-i18n="role_renter_d">Browse houses, flats &amp; rooms and contact owners directly. No account needed.</div>
+          </button>
+          <button class="role-card" onclick="setRole('owner')">
+            <div class="role-ico">🏠</div>
+            <div class="role-t" data-i18n="role_owner_t">I want to list my property</div>
+            <div class="role-d" data-i18n="role_owner_d">Post your house and manage it anytime. Free owner account.</div>
+          </button>
+        </div>
+        <p class="hint" style="text-align:center;margin-top:14px" data-i18n="welcome_foot">You can switch anytime from the top of the page.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share sheet -->
+  <div class="modal-backdrop" id="share-modal" onclick="if(event.target===this)closeModals()">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-body">
+        <button class="close" style="position:static;float:right" onclick="closeModals()">✕</button>
+        <h2 data-i18n="share_title">Share this home</h2>
+        <p class="hint" data-i18n="share_sub">Send it to family or friends so they can see it too.</p>
+        <div class="share-options">
+          <button class="share-opt wa" onclick="shareWhatsApp()">💬 <span data-i18n="share_whatsapp">Share on WhatsApp</span></button>
+          <button class="share-opt copy" onclick="shareCopy()">🔗 <span data-i18n="share_copy">Copy link</span></button>
+          <button class="share-opt more" id="share-native" onclick="shareNative()">📤 <span data-i18n="share_more">More options…</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="config.js?v=59"></script>
+  <script src="data.js?v=59"></script>
+  <script src="app.js?v=59"></script>
+</body>
+</html>

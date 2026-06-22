@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "kotha-bada",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "5050"],
+      "port": 5050
+    },
+    {
+      "name": "attendance",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8060", "--directory", "attendance"],
+      "port": 8060
+    }
+  ]
+}

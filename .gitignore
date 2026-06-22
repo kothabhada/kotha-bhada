@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Local-only Claude Code settings (keep shared settings.json + hooks in the repo)
+.claude/settings.local.json

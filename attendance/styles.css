@@ -1,0 +1,233 @@
+/* World Trading Pvt. Ltd. — Attendance */
+:root {
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --ink: #1a2233;
+  --muted: #6b7790;
+  --line: #e6e9f2;
+  --brand: #1f5fd6;
+  --brand-dark: #1849a8;
+  --green: #18a558;
+  --red: #e0413a;
+  --amber: #e8920f;
+  --slate: #64748b;
+  --shadow: 0 1px 3px rgba(20, 33, 61, .08), 0 8px 24px rgba(20, 33, 61, .06);
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  padding: 18px 24px;
+  background: linear-gradient(120deg, var(--brand), var(--brand-dark));
+  color: #fff;
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.logo {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(255,255,255,.18);
+  display: grid; place-items: center;
+  font-weight: 800; letter-spacing: .5px; font-size: 18px;
+  border: 1px solid rgba(255,255,255,.35);
+}
+.brand-text h1 { margin: 0; font-size: 20px; font-weight: 700; }
+.brand-text h1 span { font-weight: 400; opacity: .85; }
+.brand-text p { margin: 2px 0 0; font-size: 13px; opacity: .85; }
+.office-hours { font-size: 13px; opacity: .95; display: flex; align-items: center; gap: 8px; }
+.office-hours .dot { width: 8px; height: 8px; border-radius: 50%; background: #7ef0a6; box-shadow: 0 0 0 3px rgba(126,240,166,.25); }
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex; gap: 4px;
+  padding: 0 24px; background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.tab {
+  appearance: none; border: none; background: none; cursor: pointer;
+  padding: 14px 16px; font-size: 14px; font-weight: 600; color: var(--muted);
+  border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+.tab-panel { display: none; padding: 20px 24px 60px; max-width: 1000px; margin: 0 auto; }
+.tab-panel.active { display: block; }
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 18px;
+}
+.date-nav { display: flex; align-items: center; gap: 8px; }
+input[type="date"], input[type="month"] {
+  font: inherit; padding: 9px 12px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--card); color: var(--ink);
+}
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--card); cursor: pointer; font-size: 20px; color: var(--ink);
+  line-height: 1;
+}
+.icon-btn:hover { background: #f0f3fa; }
+.np-date {
+  font-size: 13px; font-weight: 600; color: var(--brand);
+  background: #eef3fd; border: 1px solid var(--line);
+  padding: 8px 12px; border-radius: 10px; white-space: nowrap;
+}
+.ghost-btn {
+  font: inherit; font-weight: 600; padding: 9px 14px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--card); color: var(--brand);
+  cursor: pointer;
+}
+.ghost-btn:hover { background: #eef3fd; }
+
+/* ---------- Day summary chips ---------- */
+.summary { display: flex; gap: 10px; flex-wrap: wrap; }
+.sum-chip {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--card); border: 1px solid var(--line);
+  padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+}
+.sum-chip b { font-size: 14px; }
+.sum-chip .swatch { width: 9px; height: 9px; border-radius: 50%; }
+
+/* ---------- Staff list ---------- */
+.staff-list { display: grid; gap: 12px; }
+.staff-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 16px; display: grid;
+  grid-template-columns: 1fr auto; gap: 14px; align-items: center;
+}
+.staff-main { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.avatar {
+  width: 44px; height: 44px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-weight: 700; color: #fff;
+  background: var(--brand); font-size: 16px;
+}
+.staff-name { font-weight: 700; font-size: 16px; }
+
+/* department chip (click to edit) */
+.dept-row { margin: 3px 0 2px; }
+.dept {
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line); background: #f7f9fd; color: var(--brand);
+  padding: 2px 9px; border-radius: 999px;
+}
+.dept:hover { background: #eef3fd; }
+.dept-empty { color: var(--muted); font-weight: 500; border-style: dashed; background: transparent; }
+.dept-input {
+  font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--brand);
+  border-radius: 8px; width: 160px; max-width: 100%;
+}
+
+/* hourly-rate chip (click to edit) */
+.rate {
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line); background: #e9f7ef; color: var(--green);
+  padding: 2px 9px; border-radius: 999px;
+}
+.rate:hover { filter: brightness(.97); }
+.rate.dept-empty { color: var(--muted); font-weight: 500; border-style: dashed; background: transparent; }
+.rate-input {
+  font: inherit; font-size: 13px; padding: 4px 8px; border: 1px solid var(--green);
+  border-radius: 8px; width: 90px;
+}
+
+/* worked hours / pay line */
+.worked { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.worked b { color: var(--ink); }
+
+.staff-times { font-size: 13px; color: var(--muted); margin-top: 3px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.staff-times b { color: var(--ink); font-variant-numeric: tabular-nums; }
+/* editable time (looks like text, click to edit) */
+.t-edit {
+  font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  background: none; border: none; color: var(--ink); padding: 1px 2px;
+  border-bottom: 1px dashed var(--muted); font-variant-numeric: tabular-nums;
+}
+.t-edit:hover { color: var(--brand); border-bottom-color: var(--brand); }
+.time-input {
+  font: inherit; font-size: 13px; padding: 3px 6px; border: 1px solid var(--brand); border-radius: 8px;
+}
+
+/* status badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700;
+}
+.badge-present { background: #e6f6ee; color: var(--green); }
+.badge-absent  { background: #fdeae9; color: var(--red); }
+.badge-leave   { background: #eef1f6; color: var(--slate); }
+.badge-late    { background: #fdf1dd; color: var(--amber); }
+
+/* action buttons */
+.actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 13px; cursor: pointer;
+  padding: 9px 13px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink); white-space: nowrap;
+}
+.btn:hover { background: #f0f3fa; }
+.btn-in   { background: var(--green); border-color: var(--green); color: #fff; }
+.btn-in:hover { filter: brightness(.96); background: var(--green); }
+.btn-out  { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn-out:hover { filter: brightness(.96); background: var(--brand); }
+.btn.small { padding: 7px 10px; font-size: 12px; }
+.btn.is-active { outline: 2px solid currentColor; outline-offset: 1px; }
+.btn-absent.is-active { color: var(--red); }
+.btn-leave.is-active  { color: var(--slate); }
+.btn-link {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font: inherit; font-size: 12px; text-decoration: underline; padding: 4px;
+}
+
+@media (max-width: 620px) {
+  .staff-card { grid-template-columns: 1fr; }
+  .actions { justify-content: flex-start; }
+}
+
+/* ---------- Monthly report ---------- */
+.report { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+thead th { background: #f7f9fd; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); position: sticky; top: 0; }
+tbody tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: center; font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; min-width: 26px; text-align: center; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 13px; }
+.pill-0 { color: var(--muted); background: transparent; font-weight: 500; }
+.report .staff-cell { font-weight: 700; }
+.report .dept-col { color: var(--muted); }
+.report td.pay { font-weight: 700; color: var(--green); }
+.report td.projected { font-weight: 700; color: var(--brand); }
+.report th small { font-weight: 500; text-transform: none; letter-spacing: 0; opacity: .8; }
+.report tfoot td { background: #f7f9fd; font-weight: 700; border-top: 2px solid var(--line); }
+.report .total-label { text-align: right; text-transform: uppercase; font-size: 12px; letter-spacing: .4px; color: var(--muted); }
+.report .total-pay { font-size: 15px; }
+.report-note { padding: 12px 14px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); line-height: 1.5; }
+
+/* keep the Staff name visible while scrolling the wide table sideways */
+.report th.staff-cell, .report td.staff-cell {
+  position: sticky; left: 0; z-index: 1; background: var(--card);
+}
+.report thead th.staff-cell { background: #f7f9fd; }
+.report tfoot td.staff-cell { background: #f7f9fd; }
+
+/* ---------- misc ---------- */
+.loading { padding: 40px; text-align: center; color: var(--muted); }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1a2233; color: #fff; padding: 11px 18px; border-radius: 10px;
+  font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s; box-shadow: var(--shadow); z-index: 50;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
