@@ -42,5 +42,11 @@ Guidance for Claude Code when working in this repo.
 - `photosOf()` / gallery: video (if any) is the FIRST gallery slide, then photos.
 - Footer contact is live: WhatsApp `wa.me/9779744325842`, email `kothabhada246@gmail.com`.
 
+## Deployment (LIVE)
+- **Live:** https://inspiring-narwhal-bdd459.netlify.app (Netlify). **Code:** https://github.com/kothabhada/kotha-bhada
+- Netlify is connected to the GitHub repo → **every `git push` to `main` auto-deploys** (~30s). No build step; publish dir is repo root.
+- To ship a change: edit → bump cache-buster (the PostToolUse hook does this) → `git add -A && git commit && git push`.
+
 ## Next step
-Deploy online (e.g. Netlify) so share links / WhatsApp work for real and the app installs on phones. See PROGRESS.md.
+- 🔒 Turn Supabase "Confirm email" back ON now that the app is public (was OFF for testing).
+- Optional: rename Netlify site to `kotha-bhada.netlify.app`; add a custom domain. See PROGRESS.md.

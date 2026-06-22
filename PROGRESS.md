@@ -66,12 +66,19 @@ That's it — no build step. It's plain HTML/CSS/JS.
 
 ---
 
+## 🌐 LIVE ONLINE ✅
+- **Live site:** https://inspiring-narwhal-bdd459.netlify.app  _(rename in Netlify → Site name)_
+- **Code on GitHub:** https://github.com/kothabhada/kotha-bhada
+- **Hosting:** Netlify, connected to the GitHub repo. **Auto-deploys on every `git push`** to `main`.
+  - To update the live site: edit files → `git add -A && git commit -m "..."` → `git push`. Netlify rebuilds in ~30s.
+
+---
+
 ## 👉 NEXT STEPS (pick up here)
-1. **Put Kotha Bhada online (deploy)** — biggest next milestone. Free host like Netlify gives a real link so:
-   - share links work for real people (not just localhost)
-   - you can install it on your phone and see the icon
-2. **Before launch:** turn Supabase "Confirm email" back ON + update footer contact (above).
-3. Optional polish ideas not yet built:
+1. 🔒 **Turn Supabase "Confirm email" back ON** (Authentication → Sign In/Providers) so strangers can't make fake owner accounts now that the app is public.
+2. (Optional) **Rename the Netlify site** to `kotha-bhada.netlify.app` for a cleaner share link.
+3. (Optional) **Custom domain** — buy e.g. `kothabhada.com` and connect it in Netlify → Domain management.
+4. Optional polish ideas not yet built:
    - Full-screen photo/video view
    - Owner dashboard / featured listings
    - Remove the Map tab if you decide it's not needed
