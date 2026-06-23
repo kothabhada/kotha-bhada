@@ -584,13 +584,15 @@ async function exportCsv() {
   STAFF.forEach((s) => { byId[s.id] = s.name; deptById[s.id] = s.department || ""; rateById[s.id] = s.rate || 0; });
   rows.sort((a, b) => (a.work_date.localeCompare(b.work_date)) || (byId[a.staff_id] || "").localeCompare(byId[b.staff_id] || ""));
 
-  let csv = "Date,Staff,Department,Status,Late,Check In,Check Out,Hours,Overtime,Rate/hr,Pay\n";
+  // "sep=," tells Excel to split on commas; the BOM (added at blob time) fixes encoding.
+  let csv = "sep=,\nDate,Staff,Department,Status,Late,Check In,Check Out,Hours,Overtime,Rate/hr,Pay\n";
   rows.forEach((r) => {
     const name = byId[r.staff_id] || "";
     const status = r.status || "";
     const late = (r.late || isLate(r.check_in)) ? "Yes" : "";
     const w = workedHours(r), ot = overtimeHours(r), rate = rateById[r.staff_id];
-    csv += `${r.work_date},"${name}","${deptById[r.staff_id] || ""}",${status},${late},${fmtTime(r.check_in)},${fmtTime(r.check_out)},${w ? w.toFixed(2) : ""},${ot ? ot.toFixed(2) : ""},${rate || ""},${w && rate ? Math.round(w * rate) : ""}\n`;
+    const cin = r.check_in ? fmtTime(r.check_in) : "", cout = r.check_out ? fmtTime(r.check_out) : "";
+    csv += `${r.work_date},"${name}","${deptById[r.staff_id] || ""}",${status},${late},${cin},${cout},${w ? w.toFixed(2) : ""},${ot ? ot.toFixed(2) : ""},${rate || ""},${w && rate ? Math.round(w * rate) : ""}\n`;
   });
 
   // monthly summary per staff: total hours, earned so far, projected full month
@@ -605,7 +607,7 @@ async function exportCsv() {
     const projected = earned + remDays * STD_HOURS * (s.rate || 0);
     csv += `"${s.name}","${s.department || ""}",${hrs.toFixed(2)},${s.rate || 0},${Math.round(earned)},${Math.round(projected)}\n`;
   });
-  const blob = new Blob([csv], { type: "text/csv" });
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `attendance-${y}-${pad(m)}.csv`;
