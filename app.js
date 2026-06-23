@@ -626,18 +626,26 @@ const AREAS = [
   { en: "Harisiddhi", ne: "हरिसिद्धि" },
 ];
 
-let areaMatches = [];
-let areaActiveIdx = -1;
+// Area autocomplete — two instances share this code:
+//   "search" = the Where box on the home page (also live-filters results)
+//   "post"   = the Area/Location field in the post-a-property form
+const AREA_AC = {
+  search: { input: "f-area", box: "area-suggest", filter: true },
+  post:   { input: "p-area-input", box: "p-area-suggest", filter: false },
+};
+const acMatches = { search: [], post: [] };
+const acActive = { search: -1, post: -1 };
 
-// Called on every keystroke in the Where field.
-function areaInput() {
-  applyFilters(); // keep live results updating as they type
-  const inp = document.getElementById("f-area");
-  const box = document.getElementById("area-suggest");
+// Called on every keystroke in an area field.
+function areaACInput(which) {
+  const cfg = AREA_AC[which];
+  if (cfg.filter) applyFilters(); // keep live results updating as they type
+  const inp = document.getElementById(cfg.input);
+  const box = document.getElementById(cfg.box);
   if (!inp || !box) return;
   const q = inp.value.trim().toLowerCase();
-  areaActiveIdx = -1;
-  if (!q) { hideAreaSuggest(); return; }
+  acActive[which] = -1;
+  if (!q) { hideAreaAC(which); return; }
   const isNepali = /[ऀ-ॿ]/.test(q); // did they type in Devanagari?
   const starts = [], contains = [];
   for (const a of AREAS) {
@@ -646,60 +654,68 @@ function areaInput() {
     if (en.startsWith(q) || ne.startsWith(q)) starts.push(a);
     else if (en.includes(q) || ne.includes(q)) contains.push(a);
   }
-  areaMatches = starts.concat(contains).slice(0, 8);
-  if (!areaMatches.length) { hideAreaSuggest(); return; }
+  const matches = starts.concat(contains).slice(0, 8);
+  acMatches[which] = matches;
+  if (!matches.length) { hideAreaAC(which); return; }
   // Show the name in the script they're typing (Nepali query or Nepali UI → Nepali label)
   const showNe = isNepali || lang === "ne";
-  box.innerHTML = areaMatches.map((a, i) => {
+  box.innerHTML = matches.map((a, i) => {
     const label = showNe ? a.ne : a.en;
     const idx = label.toLowerCase().indexOf(q);
     const html = idx < 0 ? label
       : label.slice(0, idx) + "<b>" + label.slice(idx, idx + q.length) + "</b>" + label.slice(idx + q.length);
-    return `<div class="suggest-item" role="option" data-i="${i}" onmousedown="pickArea(${i})">📍 ${html}</div>`;
+    return `<div class="suggest-item" role="option" data-i="${i}" onmousedown="pickAreaAC('${which}',${i})">📍 ${html}</div>`;
   }).join("");
   box.classList.add("open");
 }
 
 // Choose a suggestion (onmousedown fires before the input's blur).
-function pickArea(i) {
-  const a = areaMatches[i];
+function pickAreaAC(which, i) {
+  const cfg = AREA_AC[which];
+  const a = acMatches[which][i];
   if (a == null) return;
   // Always store the English name — listings save their area in English,
-  // so this is what makes the filter actually match.
-  document.getElementById("f-area").value = a.en;
-  hideAreaSuggest();
-  applyFilters();
+  // so this keeps search filters and saved listings consistent.
+  document.getElementById(cfg.input).value = a.en;
+  hideAreaAC(which);
+  if (cfg.filter) applyFilters();
 }
 
-function hideAreaSuggest() {
-  const box = document.getElementById("area-suggest");
+function hideAreaAC(which) {
+  const box = document.getElementById(AREA_AC[which].box);
   if (box) { box.classList.remove("open"); box.innerHTML = ""; }
-  areaActiveIdx = -1;
+  acActive[which] = -1;
 }
 
 // Arrow-key / Enter / Escape navigation for the dropdown.
-function areaKeydown(e) {
-  const box = document.getElementById("area-suggest");
+function areaACKeydown(which, e) {
+  const box = document.getElementById(AREA_AC[which].box);
   if (!box || !box.classList.contains("open")) return;
   const items = [...box.querySelectorAll(".suggest-item")];
   if (e.key === "ArrowDown") {
     e.preventDefault();
-    areaActiveIdx = Math.min(areaActiveIdx + 1, items.length - 1);
+    acActive[which] = Math.min(acActive[which] + 1, items.length - 1);
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
-    areaActiveIdx = Math.max(areaActiveIdx - 1, 0);
+    acActive[which] = Math.max(acActive[which] - 1, 0);
   } else if (e.key === "Enter") {
-    if (areaActiveIdx >= 0) { e.preventDefault(); pickArea(areaActiveIdx); }
+    if (acActive[which] >= 0) { e.preventDefault(); pickAreaAC(which, acActive[which]); }
     return;
   } else if (e.key === "Escape") {
-    hideAreaSuggest();
+    hideAreaAC(which);
     return;
   } else {
     return;
   }
-  items.forEach((el, i) => el.classList.toggle("active", i === areaActiveIdx));
-  if (items[areaActiveIdx]) items[areaActiveIdx].scrollIntoView({ block: "nearest" });
+  items.forEach((el, i) => el.classList.toggle("active", i === acActive[which]));
+  if (items[acActive[which]]) items[acActive[which]].scrollIntoView({ block: "nearest" });
 }
+
+// Back-compat wrappers for the search box's inline handlers.
+function areaInput() { areaACInput("search"); }
+function pickArea(i) { pickAreaAC("search", i); }
+function hideAreaSuggest() { hideAreaAC("search"); }
+function areaKeydown(e) { areaACKeydown("search", e); }
 
 let view = "list";
 let map = null;

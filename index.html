@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="styles.css?v=63" />
+  <link rel="stylesheet" href="styles.css?v=64" />
 </head>
 <body>
 
@@ -217,9 +217,12 @@
                 <option value="House" data-i18n="house">House</option><option value="Flat" data-i18n="flat">Flat</option><option value="Room" data-i18n="room">Room</option><option value="Office" data-i18n="office">Office</option>
               </select>
             </div>
-            <div class="form-field">
+            <div class="form-field" style="position:relative">
               <label data-i18n="l_area">Area / Location *</label>
-              <input name="area" required placeholder="e.g. New Baneshwor" data-i18n-ph="ph_area" />
+              <input id="p-area-input" name="area" required placeholder="e.g. New Baneshwor" data-i18n-ph="ph_area"
+                     autocomplete="off" oninput="areaACInput('post')" onkeydown="areaACKeydown('post',event)"
+                     onfocus="areaACInput('post')" onblur="setTimeout(function(){hideAreaAC('post')},150)" />
+              <div id="p-area-suggest" class="suggest" role="listbox" aria-label="Area suggestions"></div>
             </div>
             <div class="form-field">
               <label data-i18n="l_rent">Monthly rent (रू) *</label>
@@ -366,8 +369,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="config.js?v=63"></script>
-  <script src="data.js?v=63"></script>
-  <script src="app.js?v=63"></script>
+  <script src="config.js?v=64"></script>
+  <script src="data.js?v=64"></script>
+  <script src="app.js?v=64"></script>
 </body>
 </html>
