@@ -4,9 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>World Trading Pvt. Ltd. — Attendance</title>
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
+  <!-- ============ LOGIN ============ -->
+  <div id="loginScreen" class="login-screen" style="display:none">
+    <form id="loginForm" class="login-card">
+      <div class="login-logo">WT</div>
+      <h2>World Trading <span>Pvt. Ltd.</span></h2>
+      <p>Manager Login</p>
+      <input type="email" id="loginEmail" placeholder="Email" autocomplete="username" />
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" />
+      <button type="submit" class="login-btn">Log in</button>
+      <div id="loginErr" class="login-err"></div>
+    </form>
+  </div>
+
   <header class="topbar">
     <div class="brand">
       <div class="logo">WT</div>
@@ -15,8 +28,11 @@
         <p>Staff Attendance</p>
       </div>
     </div>
-    <div class="office-hours">
-      <span class="dot"></span> Office hours <strong>10:00 AM – 6:00 PM</strong>
+    <div class="topbar-right">
+      <div class="office-hours">
+        <span class="dot"></span> Office hours <strong>10:00 AM – 6:00 PM</strong>
+      </div>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
     </div>
   </header>
 
@@ -59,7 +75,7 @@
   <div id="toast" class="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=1"></script>
-  <script src="app.js?v=6"></script>
+  <script src="config.js?v=3"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

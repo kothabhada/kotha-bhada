@@ -15,5 +15,8 @@ const BS_OFFSET = 0;
 // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat. Nepal default = Saturday.
 const WEEKLY_OFF = 6;
 
+// Login is handled by Supabase Auth (email + password) — no password is stored
+// in this file. Only managers listed in the `managers` table can access data.
+
 const SUPABASE_READY =
   SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;

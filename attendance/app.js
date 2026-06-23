@@ -132,9 +132,15 @@ const LS_KEY = "wt_attendance";
 function lsAll() { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
 function lsSave(o) { localStorage.setItem(LS_KEY, JSON.stringify(o)); }
 
-async function boot() {
-  if (typeof supabase !== "undefined" && SUPABASE_READY) {
+function ensureClient() {
+  if (!sb && typeof supabase !== "undefined" && SUPABASE_READY) {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  return sb;
+}
+
+async function boot() {
+  if (ensureClient()) {
     try {
       const { data, error } = await sb.from("staff").select("id,name,department,hourly_rate").eq("active", true).order("sort_order");
       if (error) throw error;
@@ -149,12 +155,64 @@ async function boot() {
   }
   // local fallback
   MODE = "local";
-  const meta = lsMeta();
-  STAFF = SEED_STAFF.map((name, i) => ({
-    id: i + 1, name,
-    department: (meta[i + 1] && meta[i + 1].department) || "",
-    rate: (meta[i + 1] && meta[i + 1].rate) || 0,
-  }));
+  let list = lsStaff();
+  if (!list) {
+    const meta = lsMeta();
+    list = SEED_STAFF.map((name, i) => ({
+      id: i + 1, name,
+      department: (meta[i + 1] && meta[i + 1].department) || "",
+      rate: (meta[i + 1] && meta[i + 1].rate) || 0,
+    }));
+    lsStaffSave(list);
+  }
+  STAFF = list.map((s) => ({ ...s, department: s.department || "", rate: s.rate || 0 }));
+}
+
+// local staff list (so add/remove + department/rate persist across reloads)
+const STAFF_KEY = "wt_staff_list";
+function lsStaff() { try { return JSON.parse(localStorage.getItem(STAFF_KEY)); } catch { return null; } }
+function lsStaffSave(a) { localStorage.setItem(STAFF_KEY, JSON.stringify(a)); }
+function lsStaffPatch(id, patch) {
+  const a = lsStaff() || [];
+  const i = a.findIndex((s) => s.id === id);
+  if (i >= 0) { a[i] = { ...a[i], ...patch }; lsStaffSave(a); }
+}
+
+async function addStaff(name) {
+  name = (name || "").trim();
+  if (!name) return;
+  if (MODE === "cloud") {
+    const maxOrder = STAFF.reduce((mx, s) => Math.max(mx, s.sort_order || 0), 0);
+    const { data, error } = await sb.from("staff").insert({ name, sort_order: maxOrder + 1 }).select().single();
+    if (error) { toast("Add error: " + error.message); return; }
+    STAFF.push({ ...data, department: data.department || "", rate: Number(data.hourly_rate) || 0 });
+  } else {
+    const a = lsStaff() || [];
+    const id = a.reduce((mx, s) => Math.max(mx, s.id), 0) + 1;
+    const s = { id, name, department: "", rate: 0 };
+    a.push(s); lsStaffSave(a);
+    STAFF.push({ ...s });
+  }
+  toast("Added " + name);
+  renderDay();
+}
+
+async function removeStaff(id) {
+  const s = STAFF.find((x) => x.id === id);
+  if (!s) return;
+  if (!confirm(`Remove ${s.name}? This also deletes their attendance records.`)) return;
+  if (MODE === "cloud") {
+    const { error } = await sb.from("staff").delete().eq("id", id);
+    if (error) { toast("Remove error: " + error.message); return; }
+  } else {
+    lsStaffSave((lsStaff() || []).filter((x) => x.id !== id));
+    const all = lsAll();
+    Object.keys(all).forEach((d) => { if (all[d][id]) delete all[d][id]; });
+    lsSave(all);
+  }
+  STAFF = STAFF.filter((x) => x.id !== id);
+  toast("Removed " + s.name);
+  renderDay();
 }
 
 // staff metadata (department) for local mode
@@ -167,9 +225,7 @@ async function setDepartment(staffId, dept) {
     const { error } = await sb.from("staff").update({ department: dept }).eq("id", staffId);
     if (error) { toast("Save error: " + error.message); return; }
   } else {
-    const m = lsMeta();
-    m[staffId] = { ...(m[staffId] || {}), department: dept };
-    lsMetaSave(m);
+    lsStaffPatch(staffId, { department: dept });
   }
   const s = STAFF.find((x) => x.id === staffId);
   if (s) s.department = dept;
@@ -182,9 +238,7 @@ async function setRate(staffId, rate) {
     const { error } = await sb.from("staff").update({ hourly_rate: rate }).eq("id", staffId);
     if (error) { toast("Save error: " + error.message); return; }
   } else {
-    const m = lsMeta();
-    m[staffId] = { ...(m[staffId] || {}), rate };
-    lsMetaSave(m);
+    lsStaffPatch(staffId, { rate });
   }
   const s = STAFF.find((x) => x.id === staffId);
   if (s) s.rate = rate;
@@ -259,6 +313,16 @@ async function renderDay() {
 
   list.innerHTML = "";
   STAFF.forEach((s) => list.appendChild(staffCard(s, dayData[s.id] || {})));
+
+  const add = document.createElement("button");
+  add.className = "add-staff";
+  add.textContent = "+ Add staff";
+  add.addEventListener("click", () => {
+    const n = prompt("New staff member's name:");
+    if (n) addStaff(n);
+  });
+  list.appendChild(add);
+
   renderSummary();
   const np = document.getElementById("npDate");
   if (np) np.textContent = npDateText(curDate);
@@ -312,6 +376,13 @@ function staffCard(staff, rec) {
       </div>
     </div>
     <div class="actions"></div>`;
+
+  const rm = document.createElement("button");
+  rm.className = "remove-btn";
+  rm.title = "Remove " + staff.name;
+  rm.textContent = "✕";
+  rm.addEventListener("click", () => removeStaff(staff.id));
+  card.appendChild(rm);
 
   attachDept(card, staff);
   attachRate(card, staff);
@@ -588,4 +659,53 @@ async function init() {
   renderDay();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+// ============================================================
+// MANAGER LOGIN (Supabase Auth — email + password)
+// ============================================================
+let appStarted = false;
+
+function showApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  if (!appStarted) { appStarted = true; init(); }
+}
+function showLogin() {
+  document.getElementById("loginScreen").style.display = "grid";
+  setTimeout(() => document.getElementById("loginEmail")?.focus(), 50);
+}
+
+function setupLogin() {
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const pass = document.getElementById("loginPass").value;
+    const err = document.getElementById("loginErr");
+    if (!ensureClient()) { err.textContent = "Not connected to the server."; return; }
+    err.textContent = "Signing in…";
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { err.textContent = error.message; return; }
+    err.textContent = "";
+    document.getElementById("loginPass").value = "";
+    showApp();
+  });
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    if (sb) await sb.auth.signOut();
+    appStarted = false;
+    showLogin();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  setupLogin();
+  if (ensureClient()) {
+    try {
+      const { data } = await sb.auth.getSession();
+      if (data && data.session) showApp(); else showLogin();
+      sb.auth.onAuthStateChange((_e, session) => {
+        if (!session) { appStarted = false; showLogin(); }
+      });
+    } catch (e) { showLogin(); }
+  } else {
+    // Supabase not configured — fall back to local demo with no login
+    showApp();
+  }
+});

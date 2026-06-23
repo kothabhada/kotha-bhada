@@ -52,21 +52,49 @@ create table if not exists public.attendance (
 
 create index if not exists attendance_date_idx on public.attendance (work_date);
 
--- 3) ROW LEVEL SECURITY ---------------------------------------
--- This app has no login — the manager uses it directly — so we
--- allow anonymous read + write. Lock this down with Auth before
--- exposing the URL publicly.
+-- 3) SECURITY: manager-only access ----------------------------
+-- Only the email(s) in the `managers` table can read/write anything.
+-- The public key alone gives NO access to the data.
+create table if not exists public.managers (
+  email text primary key
+);
+
+-- 🔻🔻🔻 CHANGE THIS to the email you will log in with, then create
+--        that same user in Supabase → Authentication → Users → Add user.
+insert into public.managers (email) values ('YOUR_MANAGER_EMAIL@example.com')
+  on conflict (email) do nothing;
+
+alter table public.managers enable row level security; -- no policies = not directly selectable
+
+-- SECURITY DEFINER so the check can read `managers` regardless of the caller
+create or replace function public.is_manager()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.managers m
+    where lower(m.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+
 alter table public.staff      enable row level security;
 alter table public.attendance enable row level security;
 
+-- remove any older open policies
 drop policy if exists "staff read"        on public.staff;
 drop policy if exists "attendance read"   on public.attendance;
 drop policy if exists "attendance write"  on public.attendance;
 drop policy if exists "attendance update" on public.attendance;
 drop policy if exists "attendance delete" on public.attendance;
+drop policy if exists "staff manager all"      on public.staff;
+drop policy if exists "attendance manager all" on public.attendance;
 
-create policy "staff read"        on public.staff      for select using (true);
-create policy "attendance read"   on public.attendance for select using (true);
-create policy "attendance write"  on public.attendance for insert with check (true);
-create policy "attendance update" on public.attendance for update using (true) with check (true);
-create policy "attendance delete" on public.attendance for delete using (true);
+-- managers can do everything; everyone else (incl. anon & other signed-in
+-- users from the rental app) gets nothing
+create policy "staff manager all" on public.staff
+  for all using (public.is_manager()) with check (public.is_manager());
+create policy "attendance manager all" on public.attendance
+  for all using (public.is_manager()) with check (public.is_manager());
