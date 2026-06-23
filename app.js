@@ -88,6 +88,7 @@ const I18N = {
     auth_login_title: "लग इन", auth_login_sub: "घर हाल्न र व्यवस्थापन गर्न लग इन गर्नुहोस्।",
     auth_signup_title: "आफ्नो घरधनी खाता बनाउनुहोस्", auth_signup_sub: "घर हाल्न र व्यवस्थापन गर्न निःशुल्क साइन अप गर्नुहोस्।",
     auth_login_btn: "लग इन", auth_signup_btn: "खाता बनाउनुहोस्", please_wait: "कृपया पर्खनुहोस्...",
+    auth_google: "Google बाट जारी राख्नुहोस्", auth_or: "वा इमेल प्रयोग गर्नुहोस्",
     switch_new: "नयाँ घरधनी?", switch_have: "पहिले नै खाता छ?", switch_create: "खाता बनाउनुहोस्", switch_login: "लग इन",
     // my listings
     edit: "सम्पादन", del: "मेट्नुहोस्", loggedinas: "लग इन:",
@@ -144,6 +145,7 @@ const EN = {
   auth_login_title: "Log in", auth_login_sub: "Log in to post and manage your houses.",
   auth_signup_title: "Create your owner account", auth_signup_sub: "Sign up free to post houses and manage them anytime.",
   auth_login_btn: "Log in", auth_signup_btn: "Create account", please_wait: "Please wait...",
+  auth_google: "Continue with Google", auth_or: "or use email",
   switch_new: "New owner?", switch_have: "Already have an account?", switch_create: "Create an account", switch_login: "Log in",
   role_renter_chip: "🔍 Renter", role_owner_chip: "🏠 Owner",
   toast_renter: "Browsing as a renter 🔍", toast_owner: "Owner mode — log in to post 🏠",
@@ -317,6 +319,16 @@ async function submitAuth(e) {
   e.target.reset();
   closeModals();
   showToast(authMode === "signup" ? "✅ Welcome to Kotha Bhada!" : "✅ Logged in!");
+}
+
+async function signInWithGoogle() {
+  if (!sb) { showToast("⚠️ Database not connected."); return; }
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) showToast("⚠️ " + error.message);
+  // On success the browser redirects to Google, then back here.
 }
 
 async function logout() {
