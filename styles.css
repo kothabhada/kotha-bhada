@@ -445,7 +445,7 @@ img { display: block; max-width: 100%; }
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .contact-btn.wa { background: var(--whatsapp); }
-.contact-btn.vb { background: var(--viber); }
+.contact-btn.call { background: var(--brand); }
 .owner-line { color: var(--muted); font-size: 0.9rem; margin-top: 14px; }
 
 /* Share button in detail + share sheet */

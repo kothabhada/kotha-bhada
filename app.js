@@ -45,7 +45,7 @@ const I18N = {
     mylistings: "मेरा घरहरू", login: "लग इन", logout: "लग आउट", post: "+ हाल्नुहोस्",
     // hero
     hero_title: 'घरधनीबाट सिधै <span>काठमाडौं</span>मा<br/>घर भाडामा लिनुहोस्।',
-    hero_sub: "कुनै एजेन्ट छैन। कुनै कमिसन छैन। घर, फ्ल्याट र कोठाहरू — WhatsApp वा Viber मार्फत घरधनीलाई सिधै सम्पर्क गर्नुहोस्।",
+    hero_sub: "कुनै एजेन्ट छैन। कुनै कमिसन छैन। घर, फ्ल्याट र कोठाहरू — WhatsApp वा फोनबाट घरधनीलाई सिधै सम्पर्क गर्नुहोस्।",
     trust1: "🚫 एजेन्ट शुल्क छैन", trust2: "💬 प्रत्यक्ष सम्पर्क", trust3: "📍 नक्सा खोज", trust4: "❤️ मनपर्ने सुरक्षित",
     // search
     where: "कहाँ", where_ph: "क्षेत्र जस्तै बानेश्वर, ललितपुर", type: "प्रकार",
@@ -75,7 +75,7 @@ const I18N = {
     l_bedrooms: "कोठा", l_bathrooms: "बाथरूम", l_furnishing: "फर्निसिङ", l_extras: "अतिरिक्त",
     c_parking: "🅿️ पार्किङ उपलब्ध", c_negotiable: "💬 मूल्य मोलमोलाई",
     l_desc: "विवरण", ph_desc: "पानीको आपूर्ति, पार्किङ, नजिकका स्थानहरू...",
-    l_name: "तपाईंको नाम *", ph_name: "तपाईंको नाम", l_phone: "WhatsApp/Viber नम्बर *",
+    l_name: "तपाईंको नाम *", ph_name: "तपाईंको नाम", l_phone: "WhatsApp/फोन नम्बर *",
     l_pin: "नक्सामा स्थान चिन्ह लगाउनुहोस्", h_pin: "घर भएको ठाउँमा नक्सा थिच्नुहोस्। भाडामा बस्नेले नक्सामा देख्नेछन्।",
     l_photos: "तस्बिरहरू", h_photos: "फोन वा कम्प्युटरबाट ५ वटासम्म तस्बिर छान्नुहोस्। पहिलो तस्बिर कभर हुन्छ।",
     l_video: "भिडियो (वैकल्पिक)", h_video: "छोटो वाकथ्रु भिडियो थप्नुहोस् (~५० MB भन्दा कम)। भाडामा बस्नेलाई चलिरहेको ठाउँ हेर्न मन पर्छ।",
@@ -102,7 +102,7 @@ const I18N = {
     role_renter_chip: "🔍 भाडामा बस्ने", role_owner_chip: "🏠 घरधनी",
     toast_renter: "भाडामा बस्ने रूपमा हेर्दै 🔍", toast_owner: "घरधनी मोड — हाल्न लग इन गर्नुहोस् 🏠",
     // trust signals
-    verified: "प्रमाणित", verified_owner: "प्रमाणित घरधनी", views: "हेराइ",
+    verified: "प्रमाणित", verified_owner: "प्रमाणित घरधनी", views: "हेराइ", call: "कल गर्नुहोस्",
     // share
     share: "सेयर गर्नुहोस्", share_title: "यो घर सेयर गर्नुहोस्",
     share_sub: "परिवार वा साथीहरूलाई पठाउनुहोस् ताकि उनीहरूले पनि हेर्न सकून्।",
@@ -114,7 +114,7 @@ const I18N = {
     how_title: "कोठा भाडा कसरी काम गर्छ",
     how_sub: "काठमाडौंमा घर भाडामा लिने सजिलो तरिका — एजेन्ट छैन, कमिसन छैन।",
     how1_t: "१. खोज्नुहोस्", how1_d: "क्षेत्र, मूल्य र प्रकार अनुसार घर हेर्नुहोस् — तस्बिर, भिडियो र नक्सासहित।",
-    how2_t: "२. घरधनीलाई सम्पर्क", how2_d: "WhatsApp वा Viber मार्फत घरधनीलाई सिधै सम्पर्क गर्नुहोस्। बिचमा कोही छैन।",
+    how2_t: "२. घरधनीलाई सम्पर्क", how2_d: "WhatsApp वा फोनबाट घरधनीलाई सिधै सम्पर्क गर्नुहोस्। बिचमा कोही छैन।",
     how3_t: "३. सर्नुहोस्", how3_d: "हेर्नुहोस्, भाडा मिलाउनुहोस्, र सर्नुहोस्। कमिसन छैन, लुकेको शुल्क छैन।",
     // footer
     foot_tagline: "काठमाडौं उपत्यकामा सिधै भाडा।",
@@ -149,7 +149,7 @@ const EN = {
   switch_new: "New owner?", switch_have: "Already have an account?", switch_create: "Create an account", switch_login: "Log in",
   role_renter_chip: "🔍 Renter", role_owner_chip: "🏠 Owner",
   toast_renter: "Browsing as a renter 🔍", toast_owner: "Owner mode — log in to post 🏠",
-  verified: "Verified", verified_owner: "Verified owner", views: "views",
+  verified: "Verified", verified_owner: "Verified owner", views: "views", call: "Call",
   share: "Share", share_title: "Share this home",
   share_sub: "Send it to family or friends so they can see it too.",
   share_whatsapp: "Share on WhatsApp", share_copy: "Copy link",
@@ -900,6 +900,8 @@ function openDetail(id) {
       : "";
   const waNum = String(l.phone).replace(/\D/g, "");
   const waFull = waNum.length === 10 ? "977" + waNum : waNum;
+  const telNum = "+" + waFull;
+  const phoneDisplay = waNum.length === 10 ? waNum : telNum;
   const msg = encodeURIComponent(
     `Hi ${l.owner}, I saw your "${l.title}" (${npr(l.price)}/month) on Kotha Bhada. Is it still available?`
   );
@@ -933,7 +935,7 @@ function openDetail(id) {
       }</div>
       <div class="contact-row">
         <a class="contact-btn wa" href="https://wa.me/${waFull}?text=${msg}" target="_blank">💬 WhatsApp</a>
-        <a class="contact-btn vb" href="viber://chat?number=%2B${waFull}" target="_blank">📞 Viber</a>
+        <a class="contact-btn call" href="tel:${telNum}">📞 ${tt("call")} ${phoneDisplay}</a>
       </div>
       <button class="share-btn" onclick="openShare('${l.id}')">📤 ${tt("share")}</button>
     </div>`;
