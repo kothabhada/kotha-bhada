@@ -59,9 +59,9 @@ create table if not exists public.managers (
   email text primary key
 );
 
--- 🔻🔻🔻 CHANGE THIS to the email you will log in with, then create
---        that same user in Supabase → Authentication → Users → Add user.
-insert into public.managers (email) values ('YOUR_MANAGER_EMAIL@example.com')
+-- Manager login email. Create this same user in Supabase →
+-- Authentication → Users → Add user (with a password).
+insert into public.managers (email) values ('basiccollectionseo@gmail.com')
   on conflict (email) do nothing;
 
 alter table public.managers enable row level security; -- no policies = not directly selectable
