@@ -1,7 +1,7 @@
 // World Trading Pvt. Ltd. — Attendance
 // Supabase connection (reuses the existing project).
-const SUPABASE_URL = "https://lkddojzdpavzdauvsehe.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_EfgSuJGzxp3TqXUl9WlITw_fBy1rXy9";
+const SUPABASE_URL = "https://hrroewgtjwlegbtvvdmk.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_sKHIu0NZaRxMsN3tsmV5_Q_799ZAbXi";
 
 // Office schedule
 const OFFICE_START = "10:00"; // anyone checking in after this is "Late"
